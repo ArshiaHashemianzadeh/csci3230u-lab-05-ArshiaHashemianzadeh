@@ -42,6 +42,30 @@ const paletteEl = document.getElementById('palette')
  */
 function renderBoard() {
   // TODO
+  boardEl.innerHTML = ''
+
+  for (let r = 0; r < 9; r++) {
+    const tr = document.createElement('tr')
+
+    for (let c = 0; c < 9; c++) {
+      const td = document.createElement('td')
+      td.id = `cell-${r}-${c}`
+      const value = getCell(board, r, c)
+      td.textContent = value === EMPTY ? '' : value
+
+      if (getCell(SAMPLE_BOARD, r, c) === EMPTY && value !== EMPTY) {
+        td.classList.add('user-input')
+      }
+
+      td.addEventListener('click', () => placeAt(r, c))
+      tr.appendChild(td)
+    }
+
+    boardEl.appendChild(tr)
+  }
+
+  highlightConflicts()
+  highlightDigit()
 }
 
 /**
@@ -51,8 +75,14 @@ function renderBoard() {
  */
 function highlightConflicts() {
   // TODO
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const td = document.getElementById(`cell-${r}-${c}`)
+      const hasConflict = findConflicts(board, r, c).length > 0
+      td.classList.toggle('error', hasConflict)
+    }
+  }
 }
-
 /**
  * Build the palette into <table id="palette">: a row of 1-9 (each click
  * selects that digit) followed by an undo cell.
@@ -63,6 +93,27 @@ function highlightConflicts() {
  */
 function renderPalette() {
   // TODO
+  paletteEl.innerHTML = ''
+  const tr = document.createElement('tr') 
+
+  for (let i = 1; i < 10; i++) {
+    const td = document.createElement('td')
+    td.textContent = i
+    td.dataset.digit = i
+    td.addEventListener('click', () => selectDigit(i))
+    tr.appendChild(td)
+  }
+
+  const undoTd = document.createElement('td')  
+  const img = document.createElement('img')
+  img.src = 'images/undo.png'
+  img.alt = 'Undo'
+  undoTd.appendChild(img)                      
+  undoTd.addEventListener('click', undo)        
+  tr.appendChild(undoTd)                        
+
+  paletteEl.appendChild(tr)
+
 }
 
 // ---- interaction ----------------------------------------------------
@@ -71,9 +122,28 @@ function renderPalette() {
  * Remember the chosen digit and mark its palette cell 'active'.
  * TODO: set activeDigit; toggle 'active' on the matching palette <td>.
  */
-function selectDigit(digit) {
-  // TODO
+function highlightDigit(){
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const td = document.getElementById(`cell-${r}-${c}`)
+      const value = getCell(board, r, c)
+      td.classList.toggle('highlight', value !== EMPTY && value === activeDigit)
+    }
+  }
 }
+function selectDigit(digit) {
+  activeDigit = digit
+
+  for (const td of paletteEl.querySelectorAll('td[data-digit]')) {
+    td.classList.toggle('active', Number(td.dataset.digit) === digit)
+    
+  }
+  highlightDigit()
+
+}
+
+
+
 
 /**
  * Place the active digit at (row, col).
@@ -85,11 +155,24 @@ function selectDigit(digit) {
  */
 function placeAt(row, col) {
   // TODO
+  if (activeDigit === null) return
+  if (getCell(SAMPLE_BOARD, row, col) !== EMPTY) return
+
+  history.push(structuredClone(board))
+  board = setCell(board, row, col, activeDigit)
+
+  renderBoard()
+  if (isComplete(board)) celebrate()
+  
 }
 
 /** Step back one move. TODO: if history isn't empty, pop into `board`, re-render. */
 function undo() {
   // TODO
+  if (history.length === 0) return
+  board = history.pop()
+  renderBoard()
+
 }
 
 // ---- finishing (done for you) ---------------------------------------

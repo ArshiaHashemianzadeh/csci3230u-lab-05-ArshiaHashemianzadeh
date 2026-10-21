@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=4.0" />
+    <title>Sudoku - High Scores</title>
+    <link rel="stylesheet" href="styles/sudoku.css" />
+    <script type="module" src="scripts/high_scores.js"></script>
+
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href = "index.html">
+        <img src="images/logo.gif"/>
+        
+      </a>
+      <nav>
+        <a href = "index.html" style = "color: white; margin-right: 15px"> Play Game</a>
+        <a href = "high_scores.html" style = "color: white; margin-right: 15px"> High Scores</a>
+      </nav>
+    </header>
+     <main>
+      <h1>High Scores</h1>
+
+      <table class="scores">
+        <thead>
+          <tr><th scope="col">Date</th><th scope="col">Duration</th></tr>
+        </thead>
+        <tbody id="scores-body"></tbody>
+    </table>
+    </main>
+  </body>
+</html>
